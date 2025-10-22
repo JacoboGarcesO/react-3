@@ -2,6 +2,36 @@
 
 ---
 
+## ESPACIO INICIAL: Discusión de Proyecto (20 min)
+
+### Objetivos de esta sesión:
+- Revisar el progreso del proyecto en curso
+- Discutir dudas y desafíos encontrados
+- Compartir avances individuales o de equipo
+- Alinear próximos pasos y entregables
+
+### Temas a abordar:
+1. **Estado actual del proyecto** (5 min)
+   - ¿En qué fase estamos?
+   - ¿Qué se ha completado?
+   - ¿Qué está pendiente?
+
+2. **Desafíos y soluciones** (8 min)
+   - Problemas técnicos encontrados
+   - Dificultades de implementación
+   - Compartir soluciones entre el equipo
+
+3. **Próximos pasos** (5 min)
+   - Definir tareas para la semana
+   - Establecer prioridades
+   - Asignar responsabilidades
+
+4. **Conexión con el tema de hoy** (2 min)
+   - ¿Cómo aplican los hooks al proyecto?
+   - ¿Necesitaremos routing en nuestro proyecto?
+
+---
+
 ## HORA 1: Hooks - useState y useEffect (60 min)
 
 ### 1.1 Introducción a los Hooks (5 min)
@@ -422,20 +452,20 @@ export default ListaUsuarios
 
 ```css
 .lista-usuarios {
-  padding: 20px;
+  padding: 30px;
   max-width: 1200px;
   margin: 0 auto;
 }
 
 .lista-usuarios h2 {
   text-align: center;
-  color: #667eea;
+  color: #2c3e50;
   margin-bottom: 30px;
 }
 
 .usuarios-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
 }
 
@@ -443,29 +473,29 @@ export default ListaUsuarios
   background-color: white;
   padding: 20px;
   border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s;
 }
 
 .usuario-card:hover {
   transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .usuario-card h3 {
-  color: #2c3e50;
+  color: #667eea;
   margin-bottom: 10px;
 }
 
 .usuario-card p {
   color: #666;
-  font-size: 0.9rem;
   margin: 5px 0;
 }
 
 .error {
-  color: #e74c3c;
+  color: red;
   text-align: center;
-  font-size: 1.2rem;
+  padding: 20px;
 }
 ```
 
@@ -473,142 +503,188 @@ export default ListaUsuarios
 
 **Ejemplo 3: Timer con Limpieza**
 
-**Crear `src/components/Reloj.jsx`:**
+**Crear `src/components/Temporizador.jsx`:**
 
 ```jsx
 import { useState, useEffect } from 'react'
-import './Reloj.css'
+import './Temporizador.css'
 
-function Reloj() {
-  const [hora, setHora] = useState(new Date())
+function Temporizador() {
+  const [segundos, setSegundos] = useState(0)
+  const [activo, setActivo] = useState(false)
   
   useEffect(() => {
-    // Crear un intervalo
-    const intervalo = setInterval(() => {
-      setHora(new Date())
-    }, 1000)
+    let intervalo = null
     
-    // Función de limpieza: limpiar el intervalo cuando el componente se desmonta
-    return () => {
-      clearInterval(intervalo)
-      console.log('Intervalo limpiado')
+    if (activo) {
+      intervalo = setInterval(() => {
+        setSegundos(seg => seg + 1)
+      }, 1000)
     }
-  }, [])  // Array vacío: configurar el intervalo solo una vez
+    
+    // 👇 Función de limpieza: detiene el intervalo
+    return () => {
+      if (intervalo) {
+        clearInterval(intervalo)
+      }
+    }
+  }, [activo])  // Se ejecuta cuando 'activo' cambia
+  
+  const toggleTimer = () => {
+    setActivo(!activo)
+  }
+  
+  const reiniciar = () => {
+    setSegundos(0)
+    setActivo(false)
+  }
   
   return (
-    <div className="reloj">
-      <h2>⏰ Reloj en Tiempo Real</h2>
-      <div className="hora-actual">
-        {hora.toLocaleTimeString()}
+    <div className="temporizador">
+      <h2>⏱️ Temporizador</h2>
+      <div className="tiempo">{segundos}s</div>
+      <div className="controles">
+        <button onClick={toggleTimer}>
+          {activo ? 'Pausar' : 'Iniciar'}
+        </button>
+        <button onClick={reiniciar}>Reiniciar</button>
       </div>
     </div>
   )
 }
 
-export default Reloj
+export default Temporizador
 ```
 
-**Crear `src/components/Reloj.css`:**
+**Crear `src/components/Temporizador.css`:**
 
 ```css
-.reloj {
+.temporizador {
   text-align: center;
-  padding: 30px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  padding: 40px;
+  background-color: white;
   border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   max-width: 400px;
   margin: 20px auto;
 }
 
-.reloj h2 {
+.temporizador h2 {
+  color: #2c3e50;
   margin-bottom: 20px;
 }
 
-.hora-actual {
-  font-size: 3rem;
+.tiempo {
+  font-size: 4rem;
   font-weight: 700;
-  font-family: 'Courier New', monospace;
+  color: #667eea;
+  margin: 30px 0;
+}
+
+.controles {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.controles button {
+  padding: 12px 30px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: #667eea;
+  color: white;
+  transition: all 0.3s;
+}
+
+.controles button:hover {
+  background-color: #5568d3;
 }
 ```
 
 ---
 
 **Puntos clave de useEffect:**
-- ✅ Se ejecuta DESPUÉS del render
-- ✅ Útil para operaciones asíncronas (fetch, timers)
-- ✅ Siempre limpiar efectos cuando sea necesario (timers, suscripciones)
+- ✅ Ideal para fetch de datos, suscripciones, timers
 - ✅ Array de dependencias controla cuándo se ejecuta
+- ✅ Función de limpieza previene memory leaks
+- ❌ No usar para lógica que debería estar en event handlers
 
 ---
 
-## HORA 2: React Router - Navegación entre Vistas (60 min)
+## HORA 2: React Router (60 min)
 
-### 2.1 Introducción a React Router (10 min)
+### 2.1 ¿Qué es React Router? (5 min)
 
-**¿Qué es React Router?**
-- Biblioteca para manejar navegación en aplicaciones React
-- Permite crear SPAs (Single Page Applications) con múltiples "páginas"
-- No recarga la página completa, solo cambia el contenido
+**React Router** es una librería para manejar navegación en aplicaciones React.
 
-**Conceptos clave:**
-- **Route**: Define una ruta y qué componente mostrar
-- **Link**: Enlace para navegar sin recargar la página
-- **useNavigate**: Hook para navegación programática
+**¿Por qué lo necesitamos?**
+- React es SPA (Single Page Application)
+- Necesitamos múltiples "páginas" sin recargar
+- Queremos URLs limpias y navegación fluida
+- Necesitamos navegación programática
 
----
-
-### 2.2 Instalación y Configuración (10 min)
-
-**Instalar React Router:**
-
+**Instalación:**
 ```bash
 npm install react-router-dom
 ```
 
-**Esperar a que se instale... ☕**
+---
+
+### 2.2 Conceptos Básicos (10 min)
+
+**Componentes principales:**
+
+1. **`<BrowserRouter>`**: Envuelve toda la app
+2. **`<Routes>`**: Contenedor de rutas
+3. **`<Route>`**: Define una ruta
+4. **`<Link>`**: Navegación sin recargar
+5. **`useNavigate`**: Navegación programática
+
+**Ejemplo simple de estructura:**
+
+```jsx
+<BrowserRouter>
+  <Routes>
+    <Route path="/" element={<Home />} />
+    <Route path="/about" element={<About />} />
+  </Routes>
+</BrowserRouter>
+```
 
 ---
 
-**Estructura de carpetas para las páginas:**
+### 2.3 Crear Páginas (20 min)
 
-```
-src/
-├── components/     # Componentes reutilizables
-├── pages/          # 👈 Nueva carpeta para páginas/vistas
-│   ├── Home.jsx
-│   ├── About.jsx
-│   └── Contact.jsx
-├── App.jsx
-└── main.jsx
-```
-
----
-
-### 2.3 Crear las Páginas (15 min)
+**Crear carpeta `src/pages/`**
 
 **Crear `src/pages/Home.jsx`:**
 
 ```jsx
-import './Home.css'
+import './Page.css'
 
 function Home() {
   return (
     <div className="page home-page">
-      <h1>🏠 Página de Inicio</h1>
-      <p>Bienvenido a nuestra aplicación React con enrutamiento</p>
+      <h1>🏠 Bienvenido a Mi App</h1>
+      <p className="intro">
+        Esta es una aplicación de demostración de React con Hooks y React Router.
+      </p>
+      
       <div className="features">
         <div className="feature-card">
           <h3>⚡ Rápido</h3>
-          <p>Navegación instantánea sin recargas</p>
+          <p>Navegación sin recargas de página</p>
         </div>
         <div className="feature-card">
           <h3>🎨 Moderno</h3>
-          <p>Interfaces elegantes y responsivas</p>
+          <p>Diseño limpio y responsive</p>
         </div>
         <div className="feature-card">
           <h3>🚀 Potente</h3>
-          <p>Construido con React y Router</p>
+          <p>Construido con React y Hooks</p>
         </div>
       </div>
     </div>
@@ -625,29 +701,43 @@ export default Home
   text-align: center;
 }
 
+.intro {
+  font-size: 1.2rem;
+  color: #666;
+  max-width: 600px;
+  margin: 20px auto 50px;
+}
+
 .features {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
-  margin-top: 40px;
+  gap: 30px;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 .feature-card {
   background-color: white;
-  padding: 30px;
+  padding: 40px 30px;
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s;
 }
 
 .feature-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-10px);
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
 }
 
 .feature-card h3 {
   color: #667eea;
   font-size: 1.5rem;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.feature-card p {
+  color: #666;
+  font-size: 1rem;
 }
 ```
 
@@ -656,28 +746,39 @@ export default Home
 **Crear `src/pages/About.jsx`:**
 
 ```jsx
-import './About.css'
+import './Page.css'
 
 function About() {
   return (
     <div className="page about-page">
       <h1>📖 Sobre Nosotros</h1>
+      
       <div className="about-content">
-        <p>
-          Somos una empresa dedicada a crear experiencias web increíbles
-          utilizando las últimas tecnologías.
-        </p>
-        <h2>Nuestra Misión</h2>
-        <p>
-          Hacer que el desarrollo web sea accesible y divertido para todos.
-        </p>
-        <h2>Tecnologías que usamos</h2>
-        <ul>
-          <li>⚛️ React</li>
-          <li>🎨 CSS3</li>
-          <li>📦 Vite</li>
-          <li>🛣️ React Router</li>
-        </ul>
+        <section className="about-section">
+          <h2>Nuestra Historia</h2>
+          <p>
+            Somos un equipo apasionado por crear experiencias web increíbles 
+            usando las últimas tecnologías de React.
+          </p>
+        </section>
+        
+        <section className="about-section">
+          <h2>Nuestra Misión</h2>
+          <p>
+            Proporcionar aplicaciones web rápidas, accesibles y hermosas 
+            que mejoren la vida de nuestros usuarios.
+          </p>
+        </section>
+        
+        <section className="about-section">
+          <h2>Tecnologías</h2>
+          <div className="tech-list">
+            <span className="tech-badge">⚛️ React</span>
+            <span className="tech-badge">🎣 Hooks</span>
+            <span className="tech-badge">🛣️ React Router</span>
+            <span className="tech-badge">🎨 CSS3</span>
+          </div>
+        </section>
       </div>
     </div>
   )
@@ -701,29 +802,38 @@ export default About
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.about-content h2 {
+.about-section {
+  margin-bottom: 40px;
+}
+
+.about-section:last-child {
+  margin-bottom: 0;
+}
+
+.about-section h2 {
   color: #667eea;
-  margin-top: 30px;
   margin-bottom: 15px;
 }
 
-.about-content p {
-  line-height: 1.8;
+.about-section p {
   color: #555;
+  line-height: 1.6;
   font-size: 1.1rem;
 }
 
-.about-content ul {
-  list-style: none;
-  padding: 0;
+.tech-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 20px;
 }
 
-.about-content li {
-  padding: 10px;
-  margin: 10px 0;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  font-size: 1.1rem;
+.tech-badge {
+  background-color: #667eea;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-weight: 600;
 }
 ```
 
@@ -1117,4 +1227,18 @@ function Contact() {
 
 export default Contact
 ```
-https://github.com/JacoboGarcesO/3-inline
+
+**Hook `useNavigate`:**
+- `navigate('/')`: ir a una ruta
+- `navigate(-1)`: ir atrás
+- `navigate(1)`: ir adelante
+
+---
+
+## RESUMEN Y CIERRE (5 min)
+
+### 3 en línea para praticar con los chicos: https://github.com/JacoboGarcesO/3-inline
+
+---
+
+**¡Excelente trabajo! 🎉**
